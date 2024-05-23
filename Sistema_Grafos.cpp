@@ -48,6 +48,9 @@ class Grafo{
 void Grafo::inserir_aresta(array <int, 2> a){
 	bool repete = false;
 	
+	for(unsigned int i{0}; i < a.size(); i++){
+		
+	}
 	
 	if(!repete){
 		
@@ -351,6 +354,8 @@ int main(){
         
         Grafo grafo(vertices, arestas, mEh_direcionado);
         char opcao;
+        
+        
 		do{
 			cout << "=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#" << endl;
 			cout << "       Algoritmos em Grafos" << endl;
@@ -384,13 +389,19 @@ int main(){
 					if(opcao == '1'){
 						grafo.imprimir_conjunto();
 						
-						unsigned int vertice;
+						unsigned int v;
 						cout << "Qual vertice deseja inserir? ";
-						cin >> vertice;
+						cin >> v;
 						
 						grafo.inserir_vertice(vertice);
 					} else if(opcao == '2'){
-						grafo.lista_adjacencia();
+						grafo.imprimir_conjunto();
+						array<int,2> a;
+						cout << "Qual aresta deseja criar? ";
+						
+						cin >> a[0] >> a[1];
+						grafo.inserir_aresta(a);
+						
 					}
 					opcao = '1';
 					
