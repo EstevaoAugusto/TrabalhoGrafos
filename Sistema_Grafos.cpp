@@ -13,6 +13,8 @@
 
 using namespace std;
 
+bool existe(const vector <int> &vertices, const int &vertice); //checa se um vertice existe dentro de um vetor de vertices
+
 class Grafo{
     private:
         vector <int> vertices; //vetor de tamanho dinamico
@@ -42,38 +44,50 @@ class Grafo{
         void imprimir_conjunto();
         void reescrever_arquivo();
         void inserir_vertice(int v);
-        void inserir_aresta(array <int, 2> a);
+        void inserir_aresta(const array <int, 2> &a);
+        void remover_vertice(int v);
+        void remover_aresta(const array <int, 2> &a);
 };
 
-void Grafo::inserir_aresta(array <int, 2> a){
-	bool repete = false;
+void Grafo::reescrever_arquivo(){
+	ofstream alterar("grafos.txt");
 	
-	for(unsigned int i{0}; i < a.size(); i++){
-		
+	alterar << "V = {";
+	for(unsigned int i = 0; i < vertices.size(); i++){
+		alterar << vertices.at(i);
+		if(i != vertices.size() - 1){ 
+			alterar << ", ";
+		}
 	}
+	alterar << "}; A = {(";
+	for(unsigned int i = 0; i < arestas.size(); i++){
+		alterar << arestas[i].at(0);
+		alterar << ",";
+		alterar << arestas[i].at(1) << ")";
+		if(i != arestas.size() - 1){ 
+			alterar << ",(";
+		}
+	}
+	alterar << "};";
 	
-	if(!repete){
-		
-		
+	alterar.close();
+};
+
+void Grafo::inserir_aresta(const array <int, 2> &a){
+	if(existe(vertices, a[0]) and existe(vertices, a[1])){ //checa se os vertices do array a existem 
+		arestas.push_back(a);
 		imprimir_conjunto();
 	} else {
-		cout << "A aresta já existe, ou possui um vertice inexistente." << endl;
+		cout << "ERRO: Um dos vertices nao existe." << endl;
 	}
 }
 
-void Grafo::inserir_vertice(int v){
-	bool repete = false;
-	for(unsigned int i{0}; i < vertices.size(); i++){
-        if(vertices.at(i) == v)
-            repete = true;
-    }
-    
-	if(!repete){
+void Grafo::inserir_vertice(int v){	
+	if(!existe(vertices, v)){
 		vertices.push_back(v);
-		
 		imprimir_conjunto();
 	} else {
-		cout << "O vertice já existe!" << endl;
+		cout << "ERRO: O vertice já existe!" << endl;
 	}
 };
 
@@ -105,6 +119,7 @@ void Grafo::imprimir_conjunto(){
 void Grafo::matriz_adjacencia(){
 	
     vector<vector<int>> matriz(vertices.size(), vector<int>(vertices.size()));
+    
     int x;
     int y;
     int posicao_x;
@@ -184,126 +199,43 @@ void Grafo::lista_adjacencia(){
 }
 
 
-void existe(vector <int> vertices, int vertice){
-    bool achou = false;
+bool existe(const vector <int> &vertices, const int &vertice){
     for(unsigned int i{0}; i < vertices.size(); i++){
         if(vertices.at(i) == vertice)
-            achou = true;
+            return true; // vertice existe dentro do conjunto de vertices
     }
-    if(achou == false)
-        throw string("Erro! Aresta de vertice inexistente!");
+    return false; // vertice nao existe dentro do conjunto de vertices
 }
-
-void nao_existe(vector <int> vertices, int vertice){
-    bool achou = false;
-    for(unsigned int i{0}; i < vertices.size(); i++){
-        if(vertices.at(i) == vertice)
-            achou = true;
-    }
-    if(achou == true)
-        throw string("Erro! Vertice repetido!");
-}
-/*
-Grafo iniciar(){
-	ifstream arquivo("grafos.txt");
-    char lixo;
-    vector <int> vertices;
-    vector <array <int, 2>> arestas;
-    int vertice;
-    array <int, 2> aresta;
-    bool mEh_direcionado;
-    cout << "O seu grafo eh direcionado?";
-    cin >> mEh_direcionado;
-    try{
-        arquivo >> lixo;
-        if(lixo != 'V')
-            throw string("Erro sintatico!");
-        arquivo >> lixo;
-        if(lixo != '=')
-            throw string("Erro sintatico!");
-        arquivo >> lixo;
-        if(lixo != '{')
-            throw string("Erro sintatico!");
-        while(lixo != '}'){
-            if(arquivo >> vertice)
-                nao_existe(vertices, vertice);
-            else
-                throw string("Erro sintatico!");
-            vertices.push_back(vertice);
-            arquivo >> lixo;
-            if(lixo != ',' and lixo != '}')
-                throw string("Erro sintatico!");
-        }
-        arquivo >> lixo;
-        if(lixo!= ';')
-                throw string("Erro sintatico!");
-        arquivo >> lixo;
-        if(lixo!= 'A')
-                throw string("Erro sintatico!");
-        arquivo >> lixo;
-        if(lixo != '=')
-            throw string("Erro sintatico!");
-        arquivo >> lixo;
-        if(lixo != '{')
-            throw string("Erro sintaico!");
-        while(lixo != '}'){
-            arquivo >> lixo;
-            if(lixo != '(')
-                throw string("Erro sintatico!");
-            if(arquivo >> aresta[0])
-                existe(vertices, aresta[0]);
-            else
-                throw string("Erro sintatico!");
-            arquivo >> lixo;
-
-            if(lixo != ',')
-                throw string("Erro sintatico!");
-            if(arquivo >> aresta[1])
-                existe(vertices, aresta[1]);
-            else
-                throw string("Erro sintatico!");
-            arestas.push_back(aresta);
-            arquivo >> lixo;
-            if(lixo != ')')
-                throw string("Erro sintatico!");
-            arquivo >> lixo;
-            if(lixo != ',' and lixo != '}')
-                throw string("Erro sintatico!");
-        }
-        arquivo >> lixo;
-        if(lixo!= ';')
-            throw string("Erro sintatico!");
-
-        Grafo grafo(vertices, arestas, mEh_direcionado);
-        
-    } catch(string& mensagem){
-        cerr << mensagem;
-    }
-}*/
 
 int main(){
 	ifstream arquivo("grafos.txt");
+	
 	char lixo;
-	vector <int> vertices;
-	vector <array <int, 2>> arestas;
-	int vertice;
-	array <int, 2> aresta;
+	vector <int> vertices; // vetor de vertice temporario
+	vector <array <int, 2>> arestas; // vetor dinamico de aresta temporaria
+	int vertice; // valor do vertice
+	array <int, 2> aresta; // vetor fixo de arestas
 	bool mEh_direcionado;
 	cout << "O seu grafo eh direcionado?";
 	cin >> mEh_direcionado;
 	try{
 		arquivo >> lixo;
-		if(lixo != 'V')
+		if(lixo != 'V') {
 			throw string("Erro sintatico!");
+		}
 		arquivo >> lixo;
-		if(lixo != '=')
+		if(lixo != '=') {
 			throw string("Erro sintatico!");
+		}
 		arquivo >> lixo;
-		if(lixo != '{')
+		if(lixo != '{'){
 			throw string("Erro sintatico!");
+		}
 		while(lixo != '}'){ // lera todos os valores de vertice
 			if(arquivo >> vertice){
-				nao_existe(vertices, vertice);
+				if(existe(vertices, vertice)){
+					throw string("Erro! Vertice repetido!");
+				}
 			}else{
 				throw string("Erro sintatico!");
 			}
@@ -324,22 +256,29 @@ int main(){
         arquivo >> lixo;
         if(lixo != '{')
             throw string("Erro sintaico!");
-        while(lixo != '}'){
+        while(lixo != '}'){ // lera todos os valores da aresta
             arquivo >> lixo;
             if(lixo != '(')
                 throw string("Erro sintatico!");
-            if(arquivo >> aresta[0])
-                existe(vertices, aresta[0]);
-            else
+            if(arquivo >> aresta[0]) {
+                if(!existe(vertices, aresta[0])){
+					throw string("Erro! Aresta de vertice inexistente!");
+				}
+            } else {
                 throw string("Erro sintatico!");
+			}
             arquivo >> lixo;
 
-            if(lixo != ',')
+            if(lixo != ',') {
                 throw string("Erro sintatico!");
-            if(arquivo >> aresta[1])
-                existe(vertices, aresta[1]);
-            else
+			}
+            if(arquivo >> aresta[1]){
+                if(!existe(vertices, aresta[1])){
+					throw string("Erro! Aresta de vertice inexistente!");
+				}
+            } else {
                 throw string("Erro sintatico!");
+			}
             arestas.push_back(aresta);
             arquivo >> lixo;
             if(lixo != ')')
@@ -352,6 +291,7 @@ int main(){
         if(lixo!= ';')
 			throw string("Erro sintatico!");
         
+        arquivo.close();
         Grafo grafo(vertices, arestas, mEh_direcionado);
         char opcao;
         
@@ -374,7 +314,7 @@ int main(){
 			cin >> opcao;
         
 			switch(opcao){
-				case '1': {
+				case '1': { //Insercao
 					cout << endl << endl;
 					cout << "=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#" << endl;
 					cout << "    O que deseja inserir?" << endl;
@@ -389,9 +329,8 @@ int main(){
 					if(opcao == '1'){
 						grafo.imprimir_conjunto();
 						
-						unsigned int v;
 						cout << "Qual vertice deseja inserir? ";
-						cin >> v;
+						cin >> vertice;
 						
 						grafo.inserir_vertice(vertice);
 					} else if(opcao == '2'){
@@ -407,16 +346,35 @@ int main(){
 					
 					break;
 				}
-				case '2': {
+				case '2': { //Remocao
+					cout << endl << endl;
+					cout << "=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#" << endl;
+					cout << "    O que deseja Remover?" << endl;
+					cout << "=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#" << endl << endl;
+					
+					cout << "1) Vertice" << endl;
+					cout << "2) Aresta" << endl;
+					cout << "Qualquer numero) Voltar" << endl << endl;
+					
+					cout << "Sua resposta: ";
+					cin >> opcao;
+					
+					if(opcao == '1'){
+						// codar aqui
+					} else if (opcao == '2'){
+						// codar aqui
+					}
+					
+					opcao = '2';
 					break;
 				}
-				case '3': {
+				case '3': { //Verificar grafo
 					break;
 				}
-				case '4': {
+				case '4': { //Buscar grafo
 					break;
 				}
-				case '5': {
+				case '5': { //Visualizar grafo
 					cout << endl << endl;
 					cout << "=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#" << endl;
 					cout << "    Como deseja visualizar o grafo" << endl;
@@ -447,6 +405,10 @@ int main(){
 				}
 			}
 		}while(opcao != '0');
+		
+		cout << "Salvando o grafo" << endl;
+		grafo.reescrever_arquivo();
+		cout << "O Grafo foi salvo" << endl;
 	} catch(string& mensagem){
 		cerr << mensagem;
 	}
